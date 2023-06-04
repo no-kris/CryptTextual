@@ -78,8 +78,15 @@ void banner()
 double getInitialDeposit()
 {
     double initialDeposit = 0.0;
-    std::cout << "Enter an initial deposit ... ";
-    std::cin >> initialDeposit;
+    do
+    {
+        std::cout << "Enter an initial deposit ... ";
+        std::cin >> initialDeposit;
+        if (initialDeposit < 0)
+        {
+            std::cout << "Cannot start with a negative balance ... \n";
+        }
+    } while (initialDeposit < 0);
     return initialDeposit;
 }
 
