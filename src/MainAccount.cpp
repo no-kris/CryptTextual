@@ -3,15 +3,18 @@
  * Description: This file contains the function definitions from MainAccount.h
  *
  * Author: Kris Treska
- * Date: 2023/07/04
+ * Date: 2023/06/04
  */
 
 #include "MainAccount.h"
+#include "CSVFileReader.h"
 
 // Test program
 void test()
 {
     banner();
+    Orders orderBook;
+    loadOrderBook(&orderBook);
     Account userAccount;
     double initialDeposit = getInitialDeposit();
     initializeAccount(&userAccount, initialDeposit);
@@ -19,7 +22,7 @@ void test()
     while (menuOption != 7)
     {
         menuOption = getMenuOption();
-        displayMenuOption(menuOption, &userAccount);
+        displayMenuOption(menuOption, &userAccount, &orderBook);
     } // EO while (menuOption != 7)
 }
 
@@ -31,6 +34,12 @@ void banner()
               << "Learn and Practice Crypto Trading.\n\n"
               << "Hands-on trading simulation  |  Practice trading strategies\n"
               << "============================================================\n\n";
+}
+
+// @param orderBook holds data stored in csv file
+void loadOrderBook(Orders *orderBook)
+{
+    orderBook->orders = CSVFileReader::readCSVFile("CryptoDataSheet.csv");
 }
 
 // Return a value to create an initial account balance
@@ -83,7 +92,7 @@ int getMenuOption()
 
 // @param menuOption represents a case to perform correct operation
 // @param account represents account to perform operation on
-void displayMenuOption(int menuOption, Account *account)
+void displayMenuOption(int menuOption, Account *account, Orders *orderBook)
 {
     switch (menuOption)
     {
@@ -91,7 +100,7 @@ void displayMenuOption(int menuOption, Account *account)
         printHelp();
         break;
     case 2:
-        printMarketStats();
+        printMarketStats(orderBook);
         break;
     case 3:
         makeOffer();
@@ -149,9 +158,25 @@ void printHelp()
               << "=======================================\n\n";
 }
 
-void printMarketStats()
+// Return exchange stats: number of entries, bids and asks
+void printMarketStats(Orders *orderBook)
 {
-    // TODO: include market data
+    std::cout << "Number of entries ... " << (orderBook->orders).size() << '\n';
+    unsigned int bids = 0;
+    unsigned int asks = 0;
+    for (OrderBookEntry &entry : (orderBook->orders))
+    {
+        if (entry.mOrderType == OrderBookType::BID)
+        {
+            bids++;
+        }
+        if (entry.mOrderType == OrderBookType::ASK)
+        {
+            asks++;
+        }
+    } // EO for (OrderBookEntry &entry : orderBook->orders)
+    std::cout << "Number of bids ... " << bids << '\n';
+    std::cout << "NUmber of asks ... " << asks << '\n';
 }
 
 void makeOffer()

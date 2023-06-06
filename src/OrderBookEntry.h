@@ -5,7 +5,7 @@
  *              such as price, amount, timestamp, product, and order type.
  *
  * Author: Kris Treska
- * Date: 2023/07/04
+ * Date: 2023/06/04
  */
 
 #ifndef ORDERBOOKENTRY_H
@@ -30,12 +30,15 @@ public:
                    OrderBookType mOrderType);
     ~OrderBookEntry();
 
+public:
+    static OrderBookType sToOBE(const std::string &type);
+    OrderBookType mOrderType;
+
 private:
     double mPrice;
     double mAmount;
     std::string mTimestamp;
     std::string mProduct;
-    OrderBookType mOrderType;
 };
 
 #endif /* ORDERBOOKENTRY_H */

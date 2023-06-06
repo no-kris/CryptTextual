@@ -4,7 +4,7 @@
  *              the OrderBookEntry class
  *
  * Author: Kris Treska
- * Date: 2023/07/04
+ * Date: 2023/06/04
  */
 
 #include "OrderBookEntry.h"
@@ -26,4 +26,21 @@ OrderBookEntry::OrderBookEntry(double price, double amount,
 
 OrderBookEntry::~OrderBookEntry()
 {
+}
+
+// @param type return OrderBookType: BID, ASK, NIL
+OrderBookType OrderBookEntry::sToOBE(const std::string &type)
+{
+    if (type == "BID")
+    {
+        return OrderBookType::BID;
+    }
+    else if (type == "ASK")
+    {
+        return OrderBookType::ASK;
+    }
+    else
+    {
+        return OrderBookType::NIL;
+    }
 }

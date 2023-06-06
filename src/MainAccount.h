@@ -5,13 +5,14 @@
  *              the menu and getting menu a option from user
  *
  * Author: Kris Treska
- * Date: 2023/07/04
+ * Date: 2023/06/04
  */
 
 #ifndef MAINACCOUNT_H
 #define MAINACCOUNT_H
 
 #include <iostream>
+#include <vector>
 #include "OrderBookEntry.h"
 
 struct Account
@@ -20,16 +21,22 @@ struct Account
     double coins;   // Amount of coins owned
 };
 
+struct Orders // data from csv file
+{
+    std::vector<OrderBookEntry> orders;
+};
+
 // Function prototypes
 void test();
 void banner();
+void loadOrderBook(Orders *orderBook);
 double getInitialDeposit();
 void initializeAccount(Account *account, double deposit);
 void printMenu();
 int getMenuOption();
-void displayMenuOption(int menuOption, Account *account);
+void displayMenuOption(int menuOption, Account *account, Orders *orderBook);
 void printHelp();
-void printMarketStats();
+void printMarketStats(Orders *orderBook);
 void makeOffer();
 void makeBid();
 void printAccount(Account *account);
