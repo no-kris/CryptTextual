@@ -166,11 +166,11 @@ void printMarketStats(Orders *orderBook)
     unsigned int asks = 0;
     for (OrderBookEntry &entry : (orderBook->orders))
     {
-        if (entry.mOrderType == OrderBookType::bid)
+        if (entry.getOrderType() == OrderBookType::bid)
         {
             bids++;
         }
-        if (entry.mOrderType == OrderBookType::ask)
+        if (entry.getOrderType() == OrderBookType::ask)
         {
             asks++;
         }

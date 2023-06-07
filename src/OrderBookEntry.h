@@ -32,13 +32,14 @@ public:
 
 public:
     static OrderBookType sToOBE(const std::string &type);
-    OrderBookType mOrderType;
+    inline OrderBookType getOrderType() const { return mOrderType; }
 
 private:
     double mPrice;
     double mAmount;
     std::string mTimestamp;
     std::string mProduct;
+    OrderBookType mOrderType;
 };
 
 #endif /* ORDERBOOKENTRY_H */
