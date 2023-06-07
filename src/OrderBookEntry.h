@@ -16,9 +16,9 @@
 
 enum class OrderBookType
 {
-    NIL, // No order type
-    BID, // Offering to buy
-    ASK  // Offering to sell
+    nil, // No order type
+    bid, // Offering to buy
+    ask  // Offering to sell
 };
 
 class OrderBookEntry

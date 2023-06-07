@@ -11,7 +11,7 @@
 
 // Construct an empty OrderBookEntry
 OrderBookEntry::OrderBookEntry()
-    : OrderBookEntry(0, 0, "Empty", "Empty", OrderBookType::NIL)
+    : OrderBookEntry(0, 0, "Empty", "Empty", OrderBookType::nil)
 {
 }
 
@@ -31,16 +31,16 @@ OrderBookEntry::~OrderBookEntry()
 // @param type return OrderBookType: BID, ASK, NIL
 OrderBookType OrderBookEntry::sToOBE(const std::string &type)
 {
-    if (type == "BID")
+    if (type == "bid")
     {
-        return OrderBookType::BID;
+        return OrderBookType::bid;
     }
-    else if (type == "ASK")
+    else if (type == "ask")
     {
-        return OrderBookType::ASK;
+        return OrderBookType::ask;
     }
     else
     {
-        return OrderBookType::NIL;
+        return OrderBookType::nil;
     }
 }
