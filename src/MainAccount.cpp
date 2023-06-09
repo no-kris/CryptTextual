@@ -6,6 +6,7 @@
  * Date: 2023/06/04
  */
 
+#include <string>
 #include "MainAccount.h"
 #include "CSVFileReader.h"
 
@@ -13,16 +14,16 @@
 void test()
 {
     banner();
-    Orders orderBook;
-    loadOrderBook(&orderBook);
+    OrderBook orderBook("CryptoDataSheet.csv");
+    std::string currentTime = orderBook.getEarliestTime();
     Account userAccount;
     double initialDeposit = getInitialDeposit();
     initializeAccount(&userAccount, initialDeposit);
     int menuOption = 0;
     while (menuOption != 7)
     {
-        menuOption = getMenuOption();
-        displayMenuOption(menuOption, &userAccount, &orderBook);
+        menuOption = getMenuOption(currentTime);
+        displayMenuOption(menuOption, &userAccount, orderBook, currentTime);
     } // EO while (menuOption != 7)
 }
 
@@ -34,12 +35,6 @@ void banner()
               << "Learn and Practice Crypto Trading.\n\n"
               << "Hands-on trading simulation  |  Practice trading strategies\n"
               << "============================================================\n\n";
-}
-
-// @param orderBook holds data stored in csv file
-void loadOrderBook(Orders *orderBook)
-{
-    orderBook->orders = CSVFileReader::readCSVFile("CryptoDataSheet.csv");
 }
 
 // Return a value to create an initial account balance
@@ -66,8 +61,9 @@ void initializeAccount(Account *account, double deposit)
 }
 
 // Display menu options
-void printMenu()
+void printMenu(const std::string &currentTime)
 {
+    std::cout << "\nCurrent time ... " << currentTime << '\n';
     std::cout << "\n============== MENU ==============\n"
               << "| Select an option (1 ... 6)     |\n"
               << "| Press 1 to print help          |\n"
@@ -81,9 +77,9 @@ void printMenu()
 }
 
 // Return an integer corresponding to menu option
-int getMenuOption()
+int getMenuOption(const std::string &currentTime)
 {
-    printMenu();
+    printMenu(currentTime);
     int menuChoice = 0;
     std::cout << "Enter choice ... ";
     std::cin >> menuChoice;
@@ -92,7 +88,7 @@ int getMenuOption()
 
 // @param menuOption represents a case to perform correct operation
 // @param account represents account to perform operation on
-void displayMenuOption(int menuOption, Account *account, Orders *orderBook)
+void displayMenuOption(int menuOption, Account *account, OrderBook &orderBook, std::string &timeframe)
 {
     switch (menuOption)
     {
@@ -100,7 +96,7 @@ void displayMenuOption(int menuOption, Account *account, Orders *orderBook)
         printHelp();
         break;
     case 2:
-        printMarketStats(orderBook);
+        printMarketStats(orderBook, timeframe);
         break;
     case 3:
         makeOffer();
@@ -112,7 +108,7 @@ void displayMenuOption(int menuOption, Account *account, Orders *orderBook)
         printAccount(account);
         break;
     case 6:
-        continueNext();
+        continueNextTimeframe(timeframe, orderBook);
         break;
     case 7:
         std::cout << "Now ending application, bye!\n";
@@ -148,7 +144,7 @@ void printHelp()
               << "   - This option displays information about your account,\n"
               << "     including your balance and coins owned.\n"
               << "\n"
-              << "Option 6: Continue\n"
+              << "Option 6: Continue next timeframe\n"
               << "   - Selecting this option allows you to proceed\n"
               << "     with the current operation.\n"
               << "\n"
@@ -159,24 +155,16 @@ void printHelp()
 }
 
 // Return exchange stats: number of entries, bids and asks
-void printMarketStats(Orders *orderBook)
+void printMarketStats(OrderBook &orderBook, std::string &timeframe)
 {
-    std::cout << "Number of entries ... " << (orderBook->orders).size() << '\n';
-    unsigned int bids = 0;
-    unsigned int asks = 0;
-    for (OrderBookEntry &entry : (orderBook->orders))
+    for (std::string const &key : orderBook.getKnownProducts())
     {
-        if (entry.getOrderType() == OrderBookType::bid)
-        {
-            bids++;
-        }
-        if (entry.getOrderType() == OrderBookType::ask)
-        {
-            asks++;
-        }
-    } // EO for (OrderBookEntry &entry : orderBook->orders)
-    std::cout << "Number of bids ... " << bids << '\n';
-    std::cout << "NUmber of asks ... " << asks << '\n';
+        std::cout << "\nProduct ... " << key << '\n';
+        std::vector<OrderBookEntry> entries = orderBook.getOrders(OrderBookType::ask, key, timeframe);
+        std::cout << "Number of asks ... " << entries.size() << '\n';
+        std::cout << "Highest asking price ... " << OrderBook::getHighPrice(entries) << '\n';
+        std::cout << "Lowest asking price ... " << OrderBook::getLowPrice(entries) << '\n';
+    }
 }
 
 void makeOffer()
@@ -196,7 +184,10 @@ void printAccount(Account *account)
     std::cout << "Coins owned ... " << account->coins << '\n';
 }
 
-void continueNext()
+// @param timeframe current time frame to be modified
+// @param orderBook holds data for next time frame
+void continueNextTimeframe(std::string &timeframe, OrderBook &orderBook)
 {
-    // TODO: continue to next time frame
+    std::cout << "Continuing to next time frame ... \n";
+    timeframe = orderBook.getNextTime(timeframe);
 }

@@ -14,6 +14,7 @@
 #include <iostream>
 #include <vector>
 #include "OrderBookEntry.h"
+#include "OrderBook.h"
 
 struct Account
 {
@@ -21,26 +22,20 @@ struct Account
     double coins;   // Amount of coins owned
 };
 
-struct Orders // data from csv file
-{
-    std::vector<OrderBookEntry> orders;
-};
-
 // Function prototypes
 
 void test();
 void banner();
-void loadOrderBook(Orders *orderBook);
 double getInitialDeposit();
 void initializeAccount(Account *account, double deposit);
-void printMenu();
-int getMenuOption();
-void displayMenuOption(int menuOption, Account *account, Orders *orderBook);
+void printMenu(const std::string &currentTime);
+int getMenuOption(const std::string &currentTime);
+void displayMenuOption(int menuOption, Account *account, OrderBook &orderBook, std::string &timeframe);
 void printHelp();
-void printMarketStats(Orders *orderBook);
+void printMarketStats(OrderBook &orderBook, std::string &timeframe);
 void makeOffer();
 void makeBid();
 void printAccount(Account *account);
-void continueNext();
+void continueNextTimeframe(std::string &timeframe, OrderBook &orderBook);
 
 #endif /* MAINACCOUNT.H */

@@ -33,6 +33,9 @@ public:
 public:
     static OrderBookType sToOBE(const std::string &type);
     inline OrderBookType getOrderType() const { return mOrderType; }
+    inline std::string getProduct() const { return mProduct; }
+    inline std::string getTimestamp() const { return mTimestamp; }
+    inline double getPrice() const { return mPrice; }
 
 private:
     double mPrice;
