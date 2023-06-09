@@ -33,8 +33,9 @@ int getMenuOption(const std::string &currentTime);
 void displayMenuOption(int menuOption, Account *account, OrderBook &orderBook, std::string &timeframe);
 void printHelp();
 void printMarketStats(OrderBook &orderBook, std::string &timeframe);
-void makeOffer();
+void makeAsk();
 void makeBid();
+void clearInvalidInput();
 void printAccount(Account *account);
 void continueNextTimeframe(std::string &timeframe, OrderBook &orderBook);
 

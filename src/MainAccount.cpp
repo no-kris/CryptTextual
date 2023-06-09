@@ -7,6 +7,7 @@
  */
 
 #include <string>
+#include <limits>
 #include "MainAccount.h"
 #include "CSVFileReader.h"
 
@@ -43,13 +44,16 @@ double getInitialDeposit()
     double initialDeposit = 0.0;
     do
     {
-        std::cout << "Enter an initial deposit ... ";
-        std::cin >> initialDeposit;
         if (initialDeposit < 0)
         {
             std::cout << "Cannot start with a negative balance ... \n";
         }
-    } while (initialDeposit < 0);
+        if (std::cin.fail())
+        {
+            clearInvalidInput();
+        }
+        std::cout << "Enter an initial deposit ... ";
+    } while (!(std::cin >> initialDeposit) || initialDeposit < 0);
     return initialDeposit;
 }
 
@@ -79,10 +83,16 @@ void printMenu(const std::string &currentTime)
 // Return an integer corresponding to menu option
 int getMenuOption(const std::string &currentTime)
 {
-    printMenu(currentTime);
     int menuChoice = 0;
-    std::cout << "Enter choice ... ";
-    std::cin >> menuChoice;
+    do
+    {
+        if (std::cin.fail())
+        {
+            clearInvalidInput();
+        }
+        printMenu(currentTime);
+        std::cout << "Enter choice ... ";
+    } while (!(std::cin >> menuChoice));
     return menuChoice;
 }
 
@@ -99,7 +109,7 @@ void displayMenuOption(int menuOption, Account *account, OrderBook &orderBook, s
         printMarketStats(orderBook, timeframe);
         break;
     case 3:
-        makeOffer();
+        makeAsk();
         break;
     case 4:
         makeBid();
@@ -167,14 +177,25 @@ void printMarketStats(OrderBook &orderBook, std::string &timeframe)
     }
 }
 
-void makeOffer()
+void makeAsk()
 {
-    // TODO: ask user to make offer
+    std::cout << "Make an offer in the format ... (product,price,amount) ...\n";
+    std::string userInput;
+    std::getline(std::cin, userInput);
+    std::cout << "you entered ... " << userInput << '\n';
 }
 
 void makeBid()
 {
     // TODO: ask user to make bid
+}
+
+// Clear input stream if user enters bad input
+void clearInvalidInput()
+{
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << "Unrecognizable input, try again ... \n";
 }
 
 // @param account display account info
