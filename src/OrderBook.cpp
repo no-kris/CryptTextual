@@ -8,6 +8,7 @@
  */
 
 #include <map>
+#include <algorithm>
 #include "OrderBook.h"
 
 // Construct OrderBook
@@ -85,6 +86,12 @@ std::string OrderBook::getNextTime(std::string &timestamp)
     }
 
     return nextTimestamp;
+}
+
+void OrderBook::insertOrder(OrderBookEntry &order)
+{
+    mOrders.push_back(order);
+    std::sort(mOrders.begin(), mOrders.end(), OrderBookEntry::compareTimestamps);
 }
 
 // @param orders iterate over and find highest asking price

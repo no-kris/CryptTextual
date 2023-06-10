@@ -44,3 +44,8 @@ OrderBookType OrderBookEntry::sToOBE(const std::string &type)
         return OrderBookType::nil;
     }
 }
+
+bool OrderBookEntry::compareTimestamps(OrderBookEntry &entry1, OrderBookEntry &entry2)
+{
+    return entry1.getTimestamp() < entry2.getTimestamp();
+}

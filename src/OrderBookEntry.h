@@ -36,6 +36,7 @@ public:
     inline std::string getProduct() const { return mProduct; }
     inline std::string getTimestamp() const { return mTimestamp; }
     inline double getPrice() const { return mPrice; }
+    static bool compareTimestamps(OrderBookEntry &entry1, OrderBookEntry &entry2);
 
 private:
     double mPrice;

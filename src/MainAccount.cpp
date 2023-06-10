@@ -114,10 +114,10 @@ void MainAccount::displayMenuOption(int menuOption, OrderBook &orderBook)
         printMarketStats(orderBook);
         break;
     case 3:
-        makeAsk();
+        makeAsk(orderBook);
         break;
     case 4:
-        makeBid();
+        makeBid(orderBook);
         break;
     case 5:
         printAccount();
@@ -174,29 +174,49 @@ void MainAccount::printMarketStats(OrderBook &orderBook)
     for (std::string const &key : orderBook.getKnownProducts())
     {
         std::cout << "\nProduct ... " << key << '\n';
-        std::vector<OrderBookEntry> entries =
+        std::vector<OrderBookEntry> askEntries =
             orderBook.getOrders(OrderBookType::ask, key, mCurrentTime);
-        std::cout << "Number of asks ... " << entries.size() << '\n';
-        std::cout << "Highest asking price ... "
-                  << OrderBook::getHighPrice(entries) << '\n';
-        std::cout << "Lowest asking price ... "
-                  << OrderBook::getLowPrice(entries) << '\n';
+        printNumberAsks(askEntries);
+        std::cout << std::endl;
+        std::vector<OrderBookEntry> bidEntries =
+            orderBook.getOrders(OrderBookType::bid, key, mCurrentTime);
+        printNumberBids(bidEntries);
+        std::cout << "\n----------------------------------\n";
+
     } // EO for (std::string const &key : orderBook.getKnownProducts())
 }
 
-// Prompt user to make an order book entry
-void MainAccount::makeAsk()
+void MainAccount::printNumberAsks(std::vector<OrderBookEntry> &askEntries)
+{
+    std::cout << "Number of asks ... " << askEntries.size() << '\n';
+    std::cout << "Highest asking price ... "
+              << OrderBook::getHighPrice(askEntries) << '\n';
+    std::cout << "Lowest asking price ... "
+              << OrderBook::getLowPrice(askEntries) << '\n';
+}
+
+void MainAccount::printNumberBids(std::vector<OrderBookEntry> &bidEntries)
+{
+    std::cout << "Number of bids ... " << bidEntries.size() << '\n';
+    std::cout << "Highest asking bid ... "
+              << OrderBook::getHighPrice(bidEntries) << '\n';
+    std::cout << "Lowest asking bid ... "
+              << OrderBook::getLowPrice(bidEntries) << '\n';
+}
+
+void MainAccount::makeAsk(OrderBook &orderBook)
 {
     std::cout << "\nAsk for an offer in the format"
-              << "...(product, price, amount)...eg. BTC/ETH,0.5,300\n";
+              << "...(product, price, amount)...eg. BTC/USDT,0.5,3000\n";
     std::cout << "Enter offer ... ";
     std::string userInput;
     std::getline(std::cin >> std::ws, userInput);
-    validateAskRequest(userInput);
+    validateAskRequest(userInput, orderBook);
 }
 
 // @param userInput handle any input stream errors entered from user
-void MainAccount::validateAskRequest(std::string &userInput)
+// @param orderBook insert valid ask data into orderBook
+void MainAccount::validateAskRequest(std::string &userInput, OrderBook &orderBook)
 {
     std::vector<std::string> tokens = CSVFileReader::tokenise(userInput, ',');
     if (tokens.size() != 3)
@@ -210,6 +230,7 @@ void MainAccount::validateAskRequest(std::string &userInput)
             OrderBookEntry obe = CSVFileReader::makeOrderBookEntry(tokens[1], tokens[2],
                                                                    mCurrentTime, tokens[0],
                                                                    OrderBookType::ask);
+            orderBook.insertOrder(obe);
         }
         catch (const std::exception &e)
         {
@@ -217,12 +238,44 @@ void MainAccount::validateAskRequest(std::string &userInput)
             clearInvalidInput();
         } // EO try .. catch
     }
-    std::cout << "you entered ... " << userInput << '\n';
+    std::cout << "You entered ... " << userInput << '\n';
 }
 
-void MainAccount::makeBid()
+void MainAccount::makeBid(OrderBook &orderBook)
 {
-    // TODO: ask user to make bid
+    std::cout << "\nBid for an offer in the format"
+              << "...(product, price, amount)...eg. BTC/USDT,0.5,3000\n";
+    std::cout << "Enter offer ... ";
+    std::string userInput;
+    std::getline(std::cin >> std::ws, userInput);
+    validateBidRequest(userInput, orderBook);
+}
+
+// @param userInput handle any input stream errors entered from user
+// @param orderBook insert valid bid data into orderBook
+void MainAccount::validateBidRequest(std::string &userInput, OrderBook &orderBook)
+{
+    std::vector<std::string> tokens = CSVFileReader::tokenise(userInput, ',');
+    if (tokens.size() != 3)
+    {
+        std::cerr << "Bad input entered ... " << userInput << '\n';
+    }
+    else
+    {
+        try
+        {
+            OrderBookEntry obe = CSVFileReader::makeOrderBookEntry(tokens[1], tokens[2],
+                                                                   mCurrentTime, tokens[0],
+                                                                   OrderBookType::bid);
+            orderBook.insertOrder(obe);
+        }
+        catch (const std::exception &e)
+        {
+            std::cout << "MainAccount::makeAsk something went wrong ... \n";
+            clearInvalidInput();
+        } // EO try .. catch
+    }
+    std::cout << "You entered ... " << userInput << '\n';
 }
 
 // Clear input stream if user enters bad input

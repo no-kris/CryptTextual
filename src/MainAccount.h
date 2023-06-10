@@ -23,6 +23,8 @@ public:
     ~MainAccount() = default;
 
     static void test();
+
+private:
     void banner();
     double getInitialDeposit();
     void initializeAccount(double deposit);
@@ -31,9 +33,12 @@ public:
     void displayMenuOption(int menuOption, OrderBook &orderBook);
     void printHelp();
     void printMarketStats(OrderBook &orderBook);
-    void makeAsk();
-    void validateAskRequest(std::string &userInput);
-    void makeBid();
+    void printNumberAsks(std::vector<OrderBookEntry> &askEntries);
+    void printNumberBids(std::vector<OrderBookEntry> &bidEntries);
+    void makeAsk(OrderBook &orderBook);
+    void validateAskRequest(std::string &userInput, OrderBook &orderBook);
+    void makeBid(OrderBook &orderBook);
+    void validateBidRequest(std::string &userInput, OrderBook &orderBook);
     void clearInvalidInput();
     void printAccount();
     void continueNextTimeframe(OrderBook &orderBook);
