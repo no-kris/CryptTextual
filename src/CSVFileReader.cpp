@@ -70,6 +70,30 @@ std::vector<std::string> CSVFileReader::tokenise(std::string &csvLine, char sepe
     return tokens;
 }
 
+// @return an entry in the order book with given data from user
+OrderBookEntry CSVFileReader::makeOrderBookEntry(std::string priceStr,
+                                                 std::string amountStr,
+                                                 std::string timestamp,
+                                                 std::string product,
+                                                 OrderBookType type)
+{
+    double price = 0.0, amount = 0.0;
+    try
+    {
+        price = std::stod(priceStr);
+        amount = std::stod(amountStr);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "CSVFileReader::makeOrderBookEntry Bad value "
+                  << price << '\n';
+        std::cerr << "CSVFileReader::makeOrderBookEntry Bad value "
+                  << amount << '\n';
+        throw;
+    } // EO try  .. catch
+    return OrderBookEntry(price, amount, timestamp, product, type);
+}
+
 // @param tokens convert a vector of strings into an OrderBookEntry
 OrderBookEntry CSVFileReader::makeOrderBookEntry(std::vector<std::string> &&tokens)
 {
@@ -86,8 +110,10 @@ OrderBookEntry CSVFileReader::makeOrderBookEntry(std::vector<std::string> &&toke
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Bad value " << tokens[3] << '\n';
-        std::cerr << "Bad value " << tokens[4] << '\n';
+        std::cerr << "CSVFileReader::makeOrderBookEntry Bad value "
+                  << tokens[3] << '\n';
+        std::cerr << "CSVFileReader::makeOrderBookEntry Bad value "
+                  << tokens[4] << '\n';
         throw;
     } // EO try  .. catch
     return OrderBookEntry(price, amount, tokens[0], tokens[1],

@@ -1,6 +1,6 @@
 /*
- * File Name: MainAccount.h
- * Description: This file contains functions to be used for
+ * Class Name: MainAccount
+ * Description: MainAccount is to be used for
  *              maintaining and updating an account, displaying
  *              the menu and getting menu a option from user
  *
@@ -16,27 +16,31 @@
 #include "OrderBookEntry.h"
 #include "OrderBook.h"
 
-struct Account
+class MainAccount
 {
-    double balance; // Amount left in account
-    double coins;   // Amount of coins owned
+public:
+    MainAccount();
+    ~MainAccount() = default;
+
+    static void test();
+    void banner();
+    double getInitialDeposit();
+    void initializeAccount(double deposit);
+    void printMenu();
+    int getMenuOption();
+    void displayMenuOption(int menuOption, OrderBook &orderBook);
+    void printHelp();
+    void printMarketStats(OrderBook &orderBook);
+    void makeAsk();
+    void makeBid();
+    void clearInvalidInput();
+    void printAccount();
+    void continueNextTimeframe(OrderBook &orderBook);
+
+private:
+    double mBalance;          // Amount left in account
+    double mCoins;            // Amount of coins owned
+    std::string mCurrentTime; // Timeframe for trading
 };
-
-// Function prototypes
-
-void test();
-void banner();
-double getInitialDeposit();
-void initializeAccount(Account *account, double deposit);
-void printMenu(const std::string &currentTime);
-int getMenuOption(const std::string &currentTime);
-void displayMenuOption(int menuOption, Account *account, OrderBook &orderBook, std::string &timeframe);
-void printHelp();
-void printMarketStats(OrderBook &orderBook, std::string &timeframe);
-void makeAsk();
-void makeBid();
-void clearInvalidInput();
-void printAccount(Account *account);
-void continueNextTimeframe(std::string &timeframe, OrderBook &orderBook);
 
 #endif /* MAINACCOUNT.H */

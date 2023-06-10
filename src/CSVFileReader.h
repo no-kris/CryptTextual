@@ -24,9 +24,14 @@ public:
 
 public:
     static std::vector<OrderBookEntry> readCSVFile(const std::string &csvFileName);
+    static std::vector<std::string> tokenise(std::string &csvLine, char seperator);
+    static OrderBookEntry makeOrderBookEntry(std::string priceStr,
+                                             std::string amountStr,
+                                             std::string timestamp,
+                                             std::string product,
+                                             OrderBookType type);
 
 private:
-    static std::vector<std::string> tokenise(std::string &csvLine, char seperator);
     static OrderBookEntry makeOrderBookEntry(std::vector<std::string> &&tokens);
 };
 

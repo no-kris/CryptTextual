@@ -11,25 +11,30 @@
 #include "MainAccount.h"
 #include "CSVFileReader.h"
 
-// Test program
-void test()
+// Construct and init a main account
+MainAccount::MainAccount() : mBalance(0.0), mCoins(0.0)
 {
     banner();
     OrderBook orderBook("CryptoDataSheet.csv");
-    std::string currentTime = orderBook.getEarliestTime();
-    Account userAccount;
+    mCurrentTime = orderBook.getEarliestTime();
     double initialDeposit = getInitialDeposit();
-    initializeAccount(&userAccount, initialDeposit);
+    initializeAccount(initialDeposit);
     int menuOption = 0;
     while (menuOption != 7)
     {
-        menuOption = getMenuOption(currentTime);
-        displayMenuOption(menuOption, &userAccount, orderBook, currentTime);
+        menuOption = getMenuOption();
+        displayMenuOption(menuOption, orderBook);
     } // EO while (menuOption != 7)
 }
 
+// Test program
+void MainAccount::test()
+{
+    MainAccount mainAccount;
+}
+
 // Display banner
-void banner()
+void MainAccount::banner()
 {
     std::cout << "============================================================\n"
               << "CRYPTTEXTUAL: Crypto Trading Program\n\n"
@@ -39,7 +44,7 @@ void banner()
 }
 
 // Return a value to create an initial account balance
-double getInitialDeposit()
+double MainAccount::getInitialDeposit()
 {
     double initialDeposit = 0.0;
     do
@@ -58,16 +63,16 @@ double getInitialDeposit()
 }
 
 // Initialize an account with provided deposit and 0 coins owned
-void initializeAccount(Account *account, double deposit)
+void MainAccount::initializeAccount(double deposit)
 {
-    account->balance = deposit;
-    account->coins = 0.0;
+    mBalance = deposit;
+    mCoins = 0.0;
 }
 
 // Display menu options
-void printMenu(const std::string &currentTime)
+void MainAccount::printMenu()
 {
-    std::cout << "\nCurrent time ... " << currentTime << '\n';
+    std::cout << "\nCurrent time ... " << mCurrentTime << '\n';
     std::cout << "\n============== MENU ==============\n"
               << "| Select an option (1 ... 6)     |\n"
               << "| Press 1 to print help          |\n"
@@ -81,7 +86,7 @@ void printMenu(const std::string &currentTime)
 }
 
 // Return an integer corresponding to menu option
-int getMenuOption(const std::string &currentTime)
+int MainAccount::getMenuOption()
 {
     int menuChoice = 0;
     do
@@ -90,15 +95,15 @@ int getMenuOption(const std::string &currentTime)
         {
             clearInvalidInput();
         }
-        printMenu(currentTime);
+        printMenu();
         std::cout << "Enter choice ... ";
     } while (!(std::cin >> menuChoice));
     return menuChoice;
 }
 
 // @param menuOption represents a case to perform correct operation
-// @param account represents account to perform operation on
-void displayMenuOption(int menuOption, Account *account, OrderBook &orderBook, std::string &timeframe)
+// @param orderBook holds data that some cases need to access
+void MainAccount::displayMenuOption(int menuOption, OrderBook &orderBook)
 {
     switch (menuOption)
     {
@@ -106,7 +111,7 @@ void displayMenuOption(int menuOption, Account *account, OrderBook &orderBook, s
         printHelp();
         break;
     case 2:
-        printMarketStats(orderBook, timeframe);
+        printMarketStats(orderBook);
         break;
     case 3:
         makeAsk();
@@ -115,23 +120,22 @@ void displayMenuOption(int menuOption, Account *account, OrderBook &orderBook, s
         makeBid();
         break;
     case 5:
-        printAccount(account);
+        printAccount();
         break;
     case 6:
-        continueNextTimeframe(timeframe, orderBook);
+        continueNextTimeframe(orderBook);
         break;
     case 7:
         std::cout << "Now ending application, bye!\n";
         break;
     default:
         std::cerr << "Not a valid option, try again ... \n";
-        // TODO: handleInvalidOption();
         break;
     } // EO switch (menuOption)
 }
 
 // Clarify each menu option
-void printHelp()
+void MainAccount::printHelp()
 {
     std::cout << "\n================ HELP ================\n"
               << "Option 1: Print Help\n"
@@ -164,51 +168,63 @@ void printHelp()
               << "=======================================\n\n";
 }
 
-// Return exchange stats: number of entries, bids and asks
-void printMarketStats(OrderBook &orderBook, std::string &timeframe)
+// @return exchange stats: number of entries, bids and asks, highest and lowest asking price
+void MainAccount::printMarketStats(OrderBook &orderBook)
 {
     for (std::string const &key : orderBook.getKnownProducts())
     {
         std::cout << "\nProduct ... " << key << '\n';
-        std::vector<OrderBookEntry> entries = orderBook.getOrders(OrderBookType::ask, key, timeframe);
+        std::vector<OrderBookEntry> entries =
+            orderBook.getOrders(OrderBookType::ask, key, mCurrentTime);
         std::cout << "Number of asks ... " << entries.size() << '\n';
-        std::cout << "Highest asking price ... " << OrderBook::getHighPrice(entries) << '\n';
-        std::cout << "Lowest asking price ... " << OrderBook::getLowPrice(entries) << '\n';
-    }
+        std::cout << "Highest asking price ... "
+                  << OrderBook::getHighPrice(entries) << '\n';
+        std::cout << "Lowest asking price ... "
+                  << OrderBook::getLowPrice(entries) << '\n';
+    } // EO for (std::string const &key : orderBook.getKnownProducts())
 }
 
-void makeAsk()
+void MainAccount::makeAsk()
 {
-    std::cout << "Make an offer in the format ... (product,price,amount) ...\n";
+    std::cout << "\nAsk for an offer in the format"
+              << "...(product, price, amount)...eg. BTC/ETH,0.5,300\n";
+    std::cout << "Enter offer ... ";
     std::string userInput;
-    std::getline(std::cin, userInput);
+    std::getline(std::cin >> std::ws, userInput);
+    std::vector<std::string> tokens = CSVFileReader::tokenise(userInput, ',');
+    if (tokens.size() != 3)
+    {
+        std::cerr << "Bad input entered ... " << userInput << '\n';
+    }
+    else
+    {
+        OrderBookEntry obe = CSVFileReader::makeOrderBookEntry(tokens[1], tokens[2], mCurrentTime, tokens[0], OrderBookType::ask);
+    }
     std::cout << "you entered ... " << userInput << '\n';
 }
 
-void makeBid()
+void MainAccount::makeBid()
 {
     // TODO: ask user to make bid
 }
 
 // Clear input stream if user enters bad input
-void clearInvalidInput()
+void MainAccount::clearInvalidInput()
 {
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::cout << "Unrecognizable input, try again ... \n";
 }
 
-// @param account display account info
-void printAccount(Account *account)
+void MainAccount::printAccount()
 {
-    std::cout << "Account balance ... $" << account->balance << '\n';
-    std::cout << "Coins owned ... " << account->coins << '\n';
+    std::cout << "Account balance ... $" << mBalance << '\n';
+    std::cout << "Coins owned ... " << mCoins << '\n';
 }
 
-// @param timeframe current time frame to be modified
 // @param orderBook holds data for next time frame
-void continueNextTimeframe(std::string &timeframe, OrderBook &orderBook)
+void MainAccount::continueNextTimeframe(OrderBook &orderBook)
 {
     std::cout << "Continuing to next time frame ... \n";
-    timeframe = orderBook.getNextTime(timeframe);
+    mCurrentTime = orderBook.getNextTime(mCurrentTime);
 }

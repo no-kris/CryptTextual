@@ -21,6 +21,6 @@
 
 int main(int argc, char *argv[])
 {
-    test();
+    MainAccount::test();
     return 0;
 }
