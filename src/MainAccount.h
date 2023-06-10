@@ -32,6 +32,7 @@ public:
     void printHelp();
     void printMarketStats(OrderBook &orderBook);
     void makeAsk();
+    void validateAskRequest(std::string &userInput);
     void makeBid();
     void clearInvalidInput();
     void printAccount();

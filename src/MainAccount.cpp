@@ -184,6 +184,7 @@ void MainAccount::printMarketStats(OrderBook &orderBook)
     } // EO for (std::string const &key : orderBook.getKnownProducts())
 }
 
+// Prompt user to make an order book entry
 void MainAccount::makeAsk()
 {
     std::cout << "\nAsk for an offer in the format"
@@ -191,6 +192,12 @@ void MainAccount::makeAsk()
     std::cout << "Enter offer ... ";
     std::string userInput;
     std::getline(std::cin >> std::ws, userInput);
+    validateAskRequest(userInput);
+}
+
+// @param userInput handle any input stream errors entered from user
+void MainAccount::validateAskRequest(std::string &userInput)
+{
     std::vector<std::string> tokens = CSVFileReader::tokenise(userInput, ',');
     if (tokens.size() != 3)
     {
@@ -198,7 +205,17 @@ void MainAccount::makeAsk()
     }
     else
     {
-        OrderBookEntry obe = CSVFileReader::makeOrderBookEntry(tokens[1], tokens[2], mCurrentTime, tokens[0], OrderBookType::ask);
+        try
+        {
+            OrderBookEntry obe = CSVFileReader::makeOrderBookEntry(tokens[1], tokens[2],
+                                                                   mCurrentTime, tokens[0],
+                                                                   OrderBookType::ask);
+        }
+        catch (const std::exception &e)
+        {
+            std::cout << "MainAccount::makeAsk something went wrong ... \n";
+            clearInvalidInput();
+        } // EO try .. catch
     }
     std::cout << "you entered ... " << userInput << '\n';
 }
