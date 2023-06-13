@@ -94,6 +94,56 @@ void OrderBook::insertOrder(OrderBookEntry &order)
     std::sort(mOrders.begin(), mOrders.end(), OrderBookEntry::compareTimestamps);
 }
 
+// @return a vector of sales made
+// @param product the exchange being made
+// @param timestamp the current time frame of askers and bidders
+std::vector<OrderBookEntry> OrderBook::matchAsksToBids(std::string product,
+                                                       std::string timestamp)
+{
+    std::vector<OrderBookEntry> asks = getOrders(OrderBookType::ask,
+                                                 product, timestamp);
+    std::vector<OrderBookEntry> bids = getOrders(OrderBookType::bid,
+                                                 product, timestamp);
+    std::vector<OrderBookEntry> sales;
+    std::sort(asks.begin(), asks.end(), OrderBookEntry::compareByPriceAsc);
+    std::sort(bids.begin(), bids.end(), OrderBookEntry::compareByPriceDesc);
+    for (OrderBookEntry &ask : asks)
+    {
+        for (OrderBookEntry &bid : bids)
+        {
+            if (bid.getPrice() >= ask.getPrice())
+            {
+                OrderBookEntry sale(ask.getPrice(), ask.mAmount,
+                                    timestamp, product,
+                                    OrderBookType::sale);
+                if (bid.mAmount == ask.mAmount) // Clear bid
+                {
+                    sale.mAmount = ask.mAmount;
+                    sales.push_back(sale);
+                    bid.mAmount = 0;
+                    break;
+                }
+                else if (bid.mAmount > ask.mAmount) // Update bid amount
+                {
+                    sale.mAmount = ask.mAmount;
+                    sales.push_back(sale);
+                    bid.mAmount = bid.mAmount - ask.mAmount;
+                    break;
+                }
+                else if (bid.mAmount < ask.mAmount) // Update ask amount
+                {
+                    sale.mAmount = bid.mAmount;
+                    sales.push_back(sale);
+                    ask.mAmount = ask.mAmount - bid.mAmount;
+                    bid.mAmount = 0;
+                    continue; // Go to next bidder
+                }
+            } // EO if (bid.getPrice() >= ask.getPrice())
+        }     // EO for (OrderBookEntry &bid : bids)
+    }         // EO for (OrderBookEntry &ask : asks)
+    return sales;
+}
+
 // @param orders iterate over and find highest asking price
 // @return the highest price from vector of OrderBookEntry
 double OrderBook::getHighPrice(std::vector<OrderBookEntry> &orders)

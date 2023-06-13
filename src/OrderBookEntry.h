@@ -18,16 +18,17 @@ enum class OrderBookType
 {
     nil, // No order type
     bid, // Offering to buy
-    ask  // Offering to sell
+    ask, // Offering to sell
+    sale // sale made
 };
 
 class OrderBookEntry
 {
 public:
     OrderBookEntry();
-    OrderBookEntry(double mPrice, double mAmount,
-                   std::string mTimestamp, std::string mProduct,
-                   OrderBookType mOrderType);
+    OrderBookEntry(double price, double amount,
+                   std::string timestamp, std::string product,
+                   OrderBookType orderType);
     ~OrderBookEntry();
 
 public:
@@ -40,9 +41,10 @@ public:
     static bool compareByPriceAsc(OrderBookEntry &e1, OrderBookEntry &e2);
     static bool compareByPriceDesc(OrderBookEntry &e1, OrderBookEntry &e2);
 
+    double mAmount;
+
 private:
     double mPrice;
-    double mAmount;
     std::string mTimestamp;
     std::string mProduct;
     OrderBookType mOrderType;

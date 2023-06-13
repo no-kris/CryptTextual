@@ -295,6 +295,16 @@ void MainAccount::printAccount()
 // @param orderBook holds data for next time frame
 void MainAccount::continueNextTimeframe(OrderBook &orderBook)
 {
-    std::cout << "Continuing to next time frame ... \n";
+    std::cout << "\nContinuing to next time frame ... \n";
+    for (std::string &prod : orderBook.getKnownProducts())
+    {
+        std::cout << "matching " << prod << std::endl;
+        std::vector<OrderBookEntry> sales = orderBook.matchAsksToBids(prod, mCurrentTime);
+        std::cout << "Sales: " << sales.size() << std::endl;
+        for (OrderBookEntry &sale : sales)
+        {
+            std::cout << "Sale price ... " << sale.getPrice() << std::endl;
+        }
+    }
     mCurrentTime = orderBook.getNextTime(mCurrentTime);
 }
