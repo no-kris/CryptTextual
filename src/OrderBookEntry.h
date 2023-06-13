@@ -37,6 +37,8 @@ public:
     inline std::string getTimestamp() const { return mTimestamp; }
     inline double getPrice() const { return mPrice; }
     static bool compareTimestamps(OrderBookEntry &entry1, OrderBookEntry &entry2);
+    static bool compareByPriceAsc(OrderBookEntry &e1, OrderBookEntry &e2);
+    static bool compareByPriceDesc(OrderBookEntry &e1, OrderBookEntry &e2);
 
 private:
     double mPrice;

@@ -49,3 +49,13 @@ bool OrderBookEntry::compareTimestamps(OrderBookEntry &entry1, OrderBookEntry &e
 {
     return entry1.getTimestamp() < entry2.getTimestamp();
 }
+
+bool compareByPriceAsc(OrderBookEntry &entry1, OrderBookEntry &entry2)
+{
+    return entry1.getPrice() < entry2.getPrice();
+}
+
+bool compareByPriceDesc(OrderBookEntry &entry1, OrderBookEntry &entry2)
+{
+    return entry1.getPrice() > entry2.getPrice();
+}

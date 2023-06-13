@@ -271,7 +271,7 @@ void MainAccount::validateBidRequest(std::string &userInput, OrderBook &orderBoo
         }
         catch (const std::exception &e)
         {
-            std::cout << "MainAccount::makeAsk something went wrong ... \n";
+            std::cout << "MainAccount::makeBid something went wrong ... \n";
             clearInvalidInput();
         } // EO try .. catch
     }
