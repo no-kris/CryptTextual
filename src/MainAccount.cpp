@@ -12,25 +12,28 @@
 #include "CSVFileReader.h"
 
 // Construct and init a main account
-MainAccount::MainAccount() : mBalance(0.0), mCoins(0.0)
+MainAccount::MainAccount()
 {
-    banner();
-    OrderBook orderBook("CryptoDataSheet.csv");
-    mCurrentTime = orderBook.getEarliestTime();
-    double initialDeposit = getInitialDeposit();
-    initializeAccount(initialDeposit);
-    int menuOption = 0;
-    while (menuOption != 7)
-    {
-        menuOption = getMenuOption();
-        displayMenuOption(menuOption, orderBook);
-    } // EO while (menuOption != 7)
 }
 
 // Test program
 void MainAccount::test()
 {
     MainAccount mainAccount;
+    mainAccount.process();
+}
+
+void MainAccount::process()
+{
+    banner();
+    mCurrentTime = orderBook.getEarliestTime();
+    mUsersWallet.insertCurrency("BTC", 5.0);
+    int menuOption = 0;
+    while (menuOption != 7)
+    {
+        menuOption = getMenuOption();
+        displayMenuOption(menuOption);
+    } // EO while (menuOption != 7)
 }
 
 // Display banner
@@ -41,32 +44,6 @@ void MainAccount::banner()
               << "Learn and Practice Crypto Trading.\n\n"
               << "Hands-on trading simulation  |  Practice trading strategies\n"
               << "============================================================\n\n";
-}
-
-// Return a value to create an initial account balance
-double MainAccount::getInitialDeposit()
-{
-    double initialDeposit = 0.0;
-    do
-    {
-        if (initialDeposit < 0)
-        {
-            std::cout << "Cannot start with a negative balance ... \n";
-        }
-        if (std::cin.fail())
-        {
-            clearInvalidInput();
-        }
-        std::cout << "Enter an initial deposit ... ";
-    } while (!(std::cin >> initialDeposit) || initialDeposit < 0);
-    return initialDeposit;
-}
-
-// Initialize an account with provided deposit and 0 coins owned
-void MainAccount::initializeAccount(double deposit)
-{
-    mBalance = deposit;
-    mCoins = 0.0;
 }
 
 // Display menu options
@@ -102,8 +79,7 @@ int MainAccount::getMenuOption()
 }
 
 // @param menuOption represents a case to perform correct operation
-// @param orderBook holds data that some cases need to access
-void MainAccount::displayMenuOption(int menuOption, OrderBook &orderBook)
+void MainAccount::displayMenuOption(int menuOption)
 {
     switch (menuOption)
     {
@@ -111,19 +87,19 @@ void MainAccount::displayMenuOption(int menuOption, OrderBook &orderBook)
         printHelp();
         break;
     case 2:
-        printMarketStats(orderBook);
+        printMarketStats();
         break;
     case 3:
-        makeAsk(orderBook);
+        makeAsk();
         break;
     case 4:
-        makeBid(orderBook);
+        makeBid();
         break;
     case 5:
-        printAccount();
+        mUsersWallet.printWallet();
         break;
     case 6:
-        continueNextTimeframe(orderBook);
+        continueNextTimeframe();
         break;
     case 7:
         std::cout << "Now ending application, bye!\n";
@@ -148,10 +124,10 @@ void MainAccount::printHelp()
               << "\n"
               << "Option 3: Make an Offer\n"
               << "   - With this option, you can make an offer\n"
-              << "     to buy or sell assets on the exchange platform.\n"
+              << "     to sell assets on the exchange platform.\n"
               << "\n"
               << "Option 4: Make a Bid\n"
-              << "   - Use this option to make a bid on assets\n"
+              << "   - Use this option to make a bid on currencies\n"
               << "     available on the exchange.\n"
               << "\n"
               << "Option 5: View Your Account\n"
@@ -169,7 +145,7 @@ void MainAccount::printHelp()
 }
 
 // @return exchange stats: number of entries, bids and asks, highest and lowest asking price
-void MainAccount::printMarketStats(OrderBook &orderBook)
+void MainAccount::printMarketStats()
 {
     for (std::string const &key : orderBook.getKnownProducts())
     {
@@ -204,19 +180,19 @@ void MainAccount::printNumberBids(std::vector<OrderBookEntry> &bidEntries)
               << OrderBook::getLowPrice(bidEntries) << '\n';
 }
 
-void MainAccount::makeAsk(OrderBook &orderBook)
+void MainAccount::makeAsk()
 {
     std::cout << "\nAsk for an offer in the format"
               << "...(product, price, amount)...eg. BTC/USDT,0.5,3000\n";
     std::cout << "Enter offer ... ";
     std::string userInput;
     std::getline(std::cin >> std::ws, userInput);
-    validateAskRequest(userInput, orderBook);
+    validateAskRequest(userInput);
 }
 
 // @param userInput handle any input stream errors entered from user
 // @param orderBook insert valid ask data into orderBook
-void MainAccount::validateAskRequest(std::string &userInput, OrderBook &orderBook)
+void MainAccount::validateAskRequest(std::string &userInput)
 {
     std::vector<std::string> tokens = CSVFileReader::tokenise(userInput, ',');
     if (tokens.size() != 3)
@@ -241,19 +217,18 @@ void MainAccount::validateAskRequest(std::string &userInput, OrderBook &orderBoo
     std::cout << "You entered ... " << userInput << '\n';
 }
 
-void MainAccount::makeBid(OrderBook &orderBook)
+void MainAccount::makeBid()
 {
     std::cout << "\nBid for an offer in the format"
               << "...(product, price, amount)...eg. BTC/USDT,0.5,3000\n";
     std::cout << "Enter offer ... ";
     std::string userInput;
     std::getline(std::cin >> std::ws, userInput);
-    validateBidRequest(userInput, orderBook);
+    validateBidRequest(userInput);
 }
 
 // @param userInput handle any input stream errors entered from user
-// @param orderBook insert valid bid data into orderBook
-void MainAccount::validateBidRequest(std::string &userInput, OrderBook &orderBook)
+void MainAccount::validateBidRequest(std::string &userInput)
 {
     std::vector<std::string> tokens = CSVFileReader::tokenise(userInput, ',');
     if (tokens.size() != 3)
@@ -286,14 +261,8 @@ void MainAccount::clearInvalidInput()
     std::cout << "Unrecognizable input, try again ... \n";
 }
 
-void MainAccount::printAccount()
-{
-    std::cout << "Account balance ... $" << mBalance << '\n';
-    std::cout << "Coins owned ... " << mCoins << '\n';
-}
-
 // @param orderBook holds data for next time frame
-void MainAccount::continueNextTimeframe(OrderBook &orderBook)
+void MainAccount::continueNextTimeframe()
 {
     std::cout << "\nContinuing to next time frame ... \n";
     for (std::string &prod : orderBook.getKnownProducts())

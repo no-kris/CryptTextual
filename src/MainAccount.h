@@ -15,6 +15,7 @@
 #include <vector>
 #include "OrderBookEntry.h"
 #include "OrderBook.h"
+#include "Wallet.h"
 
 class MainAccount
 {
@@ -23,30 +24,26 @@ public:
     ~MainAccount() = default;
 
     static void test();
-
-private:
+    void process();
     void banner();
-    double getInitialDeposit();
-    void initializeAccount(double deposit);
     void printMenu();
     int getMenuOption();
-    void displayMenuOption(int menuOption, OrderBook &orderBook);
+    void displayMenuOption(int menuOption);
     void printHelp();
-    void printMarketStats(OrderBook &orderBook);
+    void printMarketStats();
     void printNumberAsks(std::vector<OrderBookEntry> &askEntries);
     void printNumberBids(std::vector<OrderBookEntry> &bidEntries);
-    void makeAsk(OrderBook &orderBook);
-    void validateAskRequest(std::string &userInput, OrderBook &orderBook);
-    void makeBid(OrderBook &orderBook);
-    void validateBidRequest(std::string &userInput, OrderBook &orderBook);
+    void makeAsk();
+    void validateAskRequest(std::string &userInput);
+    void makeBid();
+    void validateBidRequest(std::string &userInput);
     void clearInvalidInput();
-    void printAccount();
-    void continueNextTimeframe(OrderBook &orderBook);
+    void continueNextTimeframe();
 
 private:
-    double mBalance;          // Amount left in account
-    double mCoins;            // Amount of coins owned
-    std::string mCurrentTime; // Timeframe for trading
+    std::string mCurrentTime;                   // Timeframe for trading
+    OrderBook orderBook{"CryptoDataSheet.csv"}; // Account order book
+    Wallet mUsersWallet;
 };
 
 #endif /* MAINACCOUNT.H */
