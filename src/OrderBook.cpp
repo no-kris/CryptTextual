@@ -105,43 +105,64 @@ std::vector<OrderBookEntry> OrderBook::matchAsksToBids(std::string product,
     std::vector<OrderBookEntry> bids = getOrders(OrderBookType::bid,
                                                  product, timestamp);
     std::vector<OrderBookEntry> sales;
-    std::sort(asks.begin(), asks.end(), OrderBookEntry::compareByPriceAsc);
-    std::sort(bids.begin(), bids.end(), OrderBookEntry::compareByPriceDesc);
+    sortAsksBids(asks, bids);
     for (OrderBookEntry &ask : asks)
     {
         for (OrderBookEntry &bid : bids)
         {
             if (bid.getPrice() >= ask.getPrice())
             {
-                OrderBookEntry sale(ask.getPrice(), ask.mAmount,
+                double askAmount = ask.getAmount();
+                double bidAmount = bid.getAmount();
+                OrderBookEntry sale(ask.getPrice(), askAmount,
                                     timestamp, product,
-                                    OrderBookType::sale);
-                if (bid.mAmount == ask.mAmount) // Clear bid
+                                    OrderBookType::asksale);
+                double saleAmount = sale.getAmount();
+                OrderBookType saleType = sale.getOrderType();
+                if (bid.getUsername() == "simuser")
                 {
-                    sale.mAmount = ask.mAmount;
+                    sale.getUsername() = "simuser";
+                    saleType = OrderBookType::bidsale;
+                }
+                else if (ask.getUsername() == "simuser")
+                {
+                    sale.getUsername() = "simuser";
+                    saleType = OrderBookType::asksale;
+                }
+                if (bidAmount == askAmount) // Clear bid
+                {
+                    saleAmount = askAmount;
                     sales.push_back(sale);
-                    bid.mAmount = 0;
+                    bidAmount = 0;
                     break;
                 }
-                else if (bid.mAmount > ask.mAmount) // Update bid amount
+                else if (bidAmount > askAmount) // Update bid amount
                 {
-                    sale.mAmount = ask.mAmount;
+                    saleAmount = askAmount;
                     sales.push_back(sale);
-                    bid.mAmount = bid.mAmount - ask.mAmount;
+                    bidAmount = bidAmount - askAmount;
                     break;
                 }
-                else if (bid.mAmount < ask.mAmount) // Update ask amount
+                else if (bidAmount < askAmount) // Update ask amount
                 {
-                    sale.mAmount = bid.mAmount;
+                    saleAmount = bidAmount;
                     sales.push_back(sale);
-                    ask.mAmount = ask.mAmount - bid.mAmount;
-                    bid.mAmount = 0;
+                    askAmount = askAmount - bidAmount;
+                    bidAmount = 0;
                     continue; // Go to next bidder
                 }
             } // EO if (bid.getPrice() >= ask.getPrice())
         }     // EO for (OrderBookEntry &bid : bids)
     }         // EO for (OrderBookEntry &ask : asks)
     return sales;
+}
+
+// @param asks sort the vector of asks from the order book
+// @param bids sort the vector of bids from the order book
+void OrderBook::sortAsksBids(std::vector<OrderBookEntry> &asks, std::vector<OrderBookEntry> &bids)
+{
+    std::sort(asks.begin(), asks.end(), OrderBookEntry::compareByPriceAsc);
+    std::sort(bids.begin(), bids.end(), OrderBookEntry::compareByPriceDesc);
 }
 
 // @param orders iterate over and find highest asking price

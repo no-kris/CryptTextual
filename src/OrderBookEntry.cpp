@@ -18,9 +18,9 @@ OrderBookEntry::OrderBookEntry()
 // Construct an OrderBookEntry with given data values
 OrderBookEntry::OrderBookEntry(double price, double amount,
                                std::string timestamp, std::string product,
-                               OrderBookType orderType)
+                               OrderBookType orderType, std::string username)
     : mPrice(price), mAmount(amount), mTimestamp(timestamp),
-      mProduct(product), mOrderType(orderType)
+      mProduct(product), mOrderType(orderType), mUsername(username)
 {
 }
 

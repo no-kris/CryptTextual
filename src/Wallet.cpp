@@ -75,14 +75,14 @@ bool Wallet::canFulfillOrder(OrderBookEntry order)
     std::vector<std::string> currencies = CSVFileReader::tokenise(orderProduct, '/');
     if (order.getOrderType() == OrderBookType::ask)
     {
-        double amount = order.mAmount;
+        double amount = order.getAmount();
         std::string currencyType = currencies[0];
         std::cout << "Wallet::canFulfillOrder " << currencyType << " , " << amount << '\n';
         return containsCurrency(currencyType, amount);
     }
     if (order.getOrderType() == OrderBookType::bid)
     {
-        double amount = order.mAmount * order.getPrice();
+        double amount = order.getAmount() * order.getPrice();
         std::string currencyType = currencies[1];
         std::cout << "Wallet::canFulfillOrder " << currencyType << " , " << amount << '\n';
         return containsCurrency(currencyType, amount);

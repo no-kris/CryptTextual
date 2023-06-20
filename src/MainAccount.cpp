@@ -164,6 +164,7 @@ void MainAccount::printMarketStats()
     } // EO for (std::string const &key : orderBook.getKnownProducts())
 }
 
+// Print order book data on asks
 void MainAccount::printNumberAsks(std::vector<OrderBookEntry> &askEntries)
 {
     std::cout << "Number of asks ... " << askEntries.size() << '\n';
@@ -173,6 +174,7 @@ void MainAccount::printNumberAsks(std::vector<OrderBookEntry> &askEntries)
               << OrderBook::getLowPrice(askEntries) << '\n';
 }
 
+// Print order book data on bids
 void MainAccount::printNumberBids(std::vector<OrderBookEntry> &bidEntries)
 {
     std::cout << "Number of bids ... " << bidEntries.size() << '\n';
@@ -182,6 +184,7 @@ void MainAccount::printNumberBids(std::vector<OrderBookEntry> &bidEntries)
               << OrderBook::getLowPrice(bidEntries) << '\n';
 }
 
+// Prompt user to enter an offer to sell assets
 void MainAccount::makeAsk()
 {
     std::cout << "\nAsk for an offer in the format"
@@ -208,6 +211,7 @@ void MainAccount::validateAskRequest(std::string &userInput)
             OrderBookEntry obe = CSVFileReader::makeOrderBookEntry(tokens[1], tokens[2],
                                                                    mCurrentTime, tokens[0],
                                                                    OrderBookType::ask);
+            obe.getUsername() = "simuser";
             if (mUsersWallet.canFulfillOrder(obe))
             {
                 std::cout << "Transaction successful ... \n";
@@ -227,6 +231,7 @@ void MainAccount::validateAskRequest(std::string &userInput)
     std::cout << "You entered ... " << userInput << '\n';
 }
 
+// Prompt user to bid to buy assets
 void MainAccount::makeBid()
 {
     std::cout << "\nBid for an offer in the format "
@@ -252,6 +257,7 @@ void MainAccount::validateBidRequest(std::string &userInput)
             OrderBookEntry obe = CSVFileReader::makeOrderBookEntry(tokens[1], tokens[2],
                                                                    mCurrentTime, tokens[0],
                                                                    OrderBookType::bid);
+            obe.getUsername() = "simuser";
             if (mUsersWallet.canFulfillOrder(obe))
             {
                 std::cout << "Transaction successful ... \n";
