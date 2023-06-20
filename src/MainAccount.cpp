@@ -28,6 +28,8 @@ void MainAccount::process()
     banner();
     mCurrentTime = orderBook.getEarliestTime();
     mUsersWallet.insertCurrency("BTC", 5.0);
+    mUsersWallet.insertCurrency("USDT", 100000);
+    mUsersWallet.removeCurrency("USDT", 95000);
     int menuOption = 0;
     while (menuOption != 7)
     {
@@ -206,7 +208,15 @@ void MainAccount::validateAskRequest(std::string &userInput)
             OrderBookEntry obe = CSVFileReader::makeOrderBookEntry(tokens[1], tokens[2],
                                                                    mCurrentTime, tokens[0],
                                                                    OrderBookType::ask);
-            orderBook.insertOrder(obe);
+            if (mUsersWallet.canFulfillOrder(obe))
+            {
+                std::cout << "Transaction successful ... \n";
+                orderBook.insertOrder(obe);
+            }
+            else
+            {
+                std::cout << "Transaction failed, insufficient funds ... \n";
+            }
         }
         catch (const std::exception &e)
         {
@@ -219,8 +229,8 @@ void MainAccount::validateAskRequest(std::string &userInput)
 
 void MainAccount::makeBid()
 {
-    std::cout << "\nBid for an offer in the format"
-              << "...(product, price, amount)...eg. BTC/USDT,0.5,3000\n";
+    std::cout << "\nBid for an offer in the format "
+              << "...(product, price, amount)... eg. BTC/USDT,0.5,3000\n";
     std::cout << "Enter offer ... ";
     std::string userInput;
     std::getline(std::cin >> std::ws, userInput);
@@ -242,7 +252,15 @@ void MainAccount::validateBidRequest(std::string &userInput)
             OrderBookEntry obe = CSVFileReader::makeOrderBookEntry(tokens[1], tokens[2],
                                                                    mCurrentTime, tokens[0],
                                                                    OrderBookType::bid);
-            orderBook.insertOrder(obe);
+            if (mUsersWallet.canFulfillOrder(obe))
+            {
+                std::cout << "Transaction successful ... \n";
+                orderBook.insertOrder(obe);
+            }
+            else
+            {
+                std::cout << "Transaction failed, insufficient funds ... \n";
+            }
         }
         catch (const std::exception &e)
         {
