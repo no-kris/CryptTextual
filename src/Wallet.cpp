@@ -90,6 +90,31 @@ bool Wallet::canFulfillOrder(OrderBookEntry order)
     return false;
 }
 
+// @param sale process sale for updating users wallet
+void Wallet::processSale(OrderBookEntry &sale)
+{
+    std::string orderProduct = sale.getProduct();
+    std::vector<std::string> currencies = CSVFileReader::tokenise(orderProduct, '/');
+    if (sale.getOrderType() == OrderBookType::asksale)
+    {
+        double moneySpent = sale.getAmount();
+        std::string currencySpent = currencies[0];
+        double moneyGained = sale.getAmount() * sale.getPrice();
+        std::string currencyGained = currencies[1];
+        mWalletCurrency[currencySpent] -= moneySpent;
+        mWalletCurrency[currencyGained] += moneyGained;
+    }
+    if (sale.getOrderType() == OrderBookType::bidsale)
+    {
+        double moneyGained = sale.getAmount();
+        std::string currencyGained = currencies[0];
+        double moneySpent = sale.getAmount() * sale.getPrice();
+        std::string currencySpent = currencies[1];
+        mWalletCurrency[currencySpent] -= moneySpent;
+        mWalletCurrency[currencyGained] += moneyGained;
+    }
+}
+
 // Print content of wallet, as a pair of currency type and currency amount
 void Wallet::printWallet()
 {

@@ -112,43 +112,39 @@ std::vector<OrderBookEntry> OrderBook::matchAsksToBids(std::string product,
         {
             if (bid.getPrice() >= ask.getPrice())
             {
-                double askAmount = ask.getAmount();
-                double bidAmount = bid.getAmount();
-                OrderBookEntry sale(ask.getPrice(), askAmount,
+                OrderBookEntry sale(ask.getPrice(), 0,
                                     timestamp, product,
                                     OrderBookType::asksale);
-                double saleAmount = sale.getAmount();
-                OrderBookType saleType = sale.getOrderType();
                 if (bid.getUsername() == "simuser")
                 {
-                    sale.getUsername() = "simuser";
-                    saleType = OrderBookType::bidsale;
+                    sale.setUsername("simuser");
+                    sale.setOrderType(OrderBookType::bidsale);
                 }
                 else if (ask.getUsername() == "simuser")
                 {
-                    sale.getUsername() = "simuser";
-                    saleType = OrderBookType::asksale;
+                    sale.setUsername("simuser");
+                    sale.setOrderType(OrderBookType::asksale);
                 }
-                if (bidAmount == askAmount) // Clear bid
+                if (bid.getAmount() == ask.getAmount()) // Clear bid
                 {
-                    saleAmount = askAmount;
+                    sale.setAmount(ask.getAmount());
                     sales.push_back(sale);
-                    bidAmount = 0;
+                    bid.setAmount(0);
                     break;
                 }
-                else if (bidAmount > askAmount) // Update bid amount
+                else if (bid.getAmount() > ask.getAmount()) // Update bid amount
                 {
-                    saleAmount = askAmount;
+                    sale.setAmount(ask.getAmount());
                     sales.push_back(sale);
-                    bidAmount = bidAmount - askAmount;
+                    bid.setAmount(bid.getAmount() - ask.getAmount());
                     break;
                 }
-                else if (bidAmount < askAmount) // Update ask amount
+                else if (bid.getAmount() < ask.getAmount() && bid.getAmount() > 0) // Update ask amount
                 {
-                    saleAmount = bidAmount;
+                    sale.setAmount(bid.getAmount());
                     sales.push_back(sale);
-                    askAmount = askAmount - bidAmount;
-                    bidAmount = 0;
+                    ask.setAmount(ask.getAmount() - bid.getAmount());
+                    bid.setAmount(0);
                     continue; // Go to next bidder
                 }
             } // EO if (bid.getPrice() >= ask.getPrice())

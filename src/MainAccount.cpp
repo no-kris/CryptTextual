@@ -27,7 +27,7 @@ void MainAccount::process()
 {
     banner();
     mCurrentTime = orderBook.getEarliestTime();
-    mUsersWallet.insertCurrency("BTC", 5.0);
+    mUsersWallet.insertCurrency("BTC", 20.0);
     mUsersWallet.insertCurrency("USDT", 100000);
     mUsersWallet.removeCurrency("USDT", 95000);
     int menuOption = 0;
@@ -211,7 +211,7 @@ void MainAccount::validateAskRequest(std::string &userInput)
             OrderBookEntry obe = CSVFileReader::makeOrderBookEntry(tokens[1], tokens[2],
                                                                    mCurrentTime, tokens[0],
                                                                    OrderBookType::ask);
-            obe.getUsername() = "simuser";
+            obe.setUsername("simuser");
             if (mUsersWallet.canFulfillOrder(obe))
             {
                 std::cout << "Transaction successful ... \n";
@@ -257,7 +257,7 @@ void MainAccount::validateBidRequest(std::string &userInput)
             OrderBookEntry obe = CSVFileReader::makeOrderBookEntry(tokens[1], tokens[2],
                                                                    mCurrentTime, tokens[0],
                                                                    OrderBookType::bid);
-            obe.getUsername() = "simuser";
+            obe.setUsername("simuser");
             if (mUsersWallet.canFulfillOrder(obe))
             {
                 std::cout << "Transaction successful ... \n";
@@ -297,6 +297,10 @@ void MainAccount::continueNextTimeframe()
         for (OrderBookEntry &sale : sales)
         {
             std::cout << "Sale price ... " << sale.getPrice() << std::endl;
+            if (sale.getUsername() == "simuser") // update wallet
+            {
+                mUsersWallet.processSale(sale);
+            }
         }
     }
     mCurrentTime = orderBook.getNextTime(mCurrentTime);

@@ -15,6 +15,7 @@ public:
     bool removeCurrency(std::string currType, double amount);
     bool containsCurrency(std::string currType, double amount);
     bool canFulfillOrder(OrderBookEntry order);
+    void processSale(OrderBookEntry &sale);
     void printWallet();
 
 private:
