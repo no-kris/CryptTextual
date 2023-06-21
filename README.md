@@ -20,6 +20,15 @@ Make sure you have C++ and a C++ compiler installed on your machine.
 
 ## Usage:
 
-- Compile and run CryptTextual.cpp
+- Compile program on UNIX/LINUX, I was using either c++20 or c++17
+```
+g++ -std=c++20 CryptTextual.cpp CSVFileReader.cpp MainAccount.cpp OrderBookEntry.cpp OrderBook.cpp Wallet.cpp -o Textual
+```
+- To run program
+```
+./Textual
+```
+- Compile program on Windows
+  * idk, use visual studio
 - Follow the on-screen prompts and enter commands to navigate
   through the program and perform trading operations.
